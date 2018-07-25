@@ -25,34 +25,36 @@ ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
 app = Flask(__name__)
 
 
-@app.route('/<path:path>', methods=["POST"])
-def style_transfer(path):
+@app.route('/', methods=["POST"])
+def style_transfer():
     """
     Take the input image and style transfer it
     """
     # check if the post request has the file part
-    if 'file' not in request.files:
+    input_file = request.files.get('file')
+    if not input_file:
         return BadRequest("File not present in request")
-    file = request.files['file']
-    if file.filename == '':
-        return BadRequest("File name is not present in request")
-    if not allowed_file(file.filename):
-        return BadRequest("Invalid file type")
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        input_filepath = os.path.join('./images/', filename)
-        output_filepath = os.path.join('/output/', filename)
-        file.save(input_filepath)
 
-        # Get checkpoint filename from la_muse
-        checkpoint = request.form.get("checkpoint") or "la_muse.ckpt"
-        ffwd_to_img(input_filepath, output_filepath, '/input/' + checkpoint, '/gpu:0')
-        return send_file(output_filepath, mimetype='image/jpg')
+    filename = secure_filename(input_file.filename)
+    if filename == '':
+        return BadRequest("File name is not present in request")
+    if not allowed_file(filename):
+        return BadRequest("Invalid file type")
+
+    input_filepath = os.path.join('./images/', filename)
+    output_filepath = os.path.join('/output/', filename)
+    input_file.save(input_filepath)
+
+    # Get checkpoint filename from la_muse
+    checkpoint = request.form.get("checkpoint", "la_muse.ckpt")
+    ffwd_to_img(input_filepath, output_filepath, '/input/' + checkpoint, '/gpu:0')
+    return send_file(output_filepath, mimetype='image/jpg')
 
 
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
