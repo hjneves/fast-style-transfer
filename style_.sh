@@ -6,7 +6,7 @@ else
 fi
 
 if [ "$2" != "" ]; then
-    NR_ITERATIONS=$1
+    NR_ITERATIONS=$2
 else
     NR_ITERATIONS=500
 fi

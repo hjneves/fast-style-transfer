@@ -1,7 +1,7 @@
 if [ "$1" != "" ]; then
     FLOYD_JOB=$1
 else
-    echo "Sintax transfer.sh floydjob"
+    echo "Sintax evaluate.sh floydjob"
     exit 1
 fi
 
