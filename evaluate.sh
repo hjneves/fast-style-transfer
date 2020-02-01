@@ -13,3 +13,4 @@ floyd run --env tensorflow-0.12:py2 \
   --in-path ./images/ \
   --batch-size 1 \
   --out-path ./output/"
+  
